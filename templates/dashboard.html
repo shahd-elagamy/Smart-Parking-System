@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Parking Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto 40px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-box, .stats-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .video-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .stats-box p {
+            font-size: 18px;
+            margin: 8px 0;
+        }
+
+        #occupied {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        #available {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        #total {
+            color: #2980b9;
+            font-weight: bold;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+
+        #occupied-spots {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-size: 15px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        #occupied-spots p {
+            margin: 8px 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Smart Parking Dashboard</h2>
+
+    <div class="container">
+        <!-- ✅ فيديو المعالجة -->
+        <div class="video-box">
+            <img src="/video_feed" width="640" height="360" alt="Live Video">
+            
+            <!-- 🆕 الرسم البياني الزمني -->
+            <canvas id="timeChart" width="640" height="200" style="margin-top: 20px;"></canvas>
+            <canvas id="ratioChart" width="640" height="200" style="margin-top: 20px;"></canvas>
+        </div>
+
+        <!-- ✅ التحليل الإحصائي -->
+        <div class="stats-box">
+            <p>⏰ Time: <span id="current-time">--:--:--</span> | 📅 Date: <span id="current-date">--/--/----</span> | 📆 Day: <span id="current-day">---</span></p>
+            <p>🚗 Occupied: <span id="occupied">0</span></p>
+            <p>🅿️ Available: <span id="available">0</span></p>
+            <p>📊 Total: <span id="total">0</span></p>
+
+            <canvas id="occupancyChart" width="400" height="200"></canvas>
+            
+        </div>
+    </div>
+
+    
+
+    <h3>Occupied Parking Spots:</h3>
+    <div id="occupied-spots"></div>
+    <script>
+        async function fetchData() {
+            const res = await fetch('/data');
+            const data = await res.json();
+
+            if (!data.error) {
+                document.getElementById('occupied').textContent = data.occupied;
+                document.getElementById('available').textContent = data.available;
+                document.getElementById('total').textContent = data.total;
+
+                myChart.data.datasets[0].data = [data.occupied, data.available];
+                myChart.update();
+
+                const spotList = data.spots.map(spot => {
+                    return `<p>${spot.timestamp} - Spot ${spot.spot} OCCUPIED - Coords: ${JSON.stringify(spot.coords)}</p>`;
+                }).join("");
+                document.getElementById('occupied-spots').innerHTML = spotList;
+
+                // تحديث الرسم البياني الزمني
+                const now = new Date().toLocaleTimeString();
+                if (timeChart.data.labels.length >= 20) {
+                    timeChart.data.labels.shift();
+                    timeChart.data.datasets[0].data.shift();
+                }
+                timeChart.data.labels.push(now);
+                timeChart.data.datasets[0].data.push(data.occupied);
+                timeChart.update();
+
+                // تحديث الرسم البياني للـ Available / Occupied ratio
+                const ratio = (data.available / data.occupied).toFixed(2);
+                if (ratioChart.data.labels.length >= 20) {
+                    ratioChart.data.labels.shift();
+                    ratioChart.data.datasets[0].data.shift();
+                }
+                ratioChart.data.labels.push(now);
+                ratioChart.data.datasets[0].data.push(ratio);
+                ratioChart.update();
+            }
+        }
+
+        const ctx = document.getElementById('occupancyChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Occupied', 'Available'],
+                datasets: [{
+                    label: 'Occupancy',
+                    data: [0, 0],
+                    backgroundColor: ['#ff4c4c', '#4cff4c']
+                }]
+            }
+        });
+
+        const timeCtx = document.getElementById('timeChart').getContext('2d');
+        const timeChart = new Chart(timeCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Occupied Over Time',
+                    data: [],
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Occupied Spots'
+                        }
+                    }
+                }
+            }
+        });
+
+        const ratioCtx = document.getElementById('ratioChart').getContext('2d');
+        const ratioChart = new Chart(ratioCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Available / Occupied Ratio',
+                    data: [],
+                    borderColor: '#2980b9',
+                    backgroundColor: 'rgba(41, 128, 185, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Ratio'
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateTimeAndDate() {
+            const now = new Date();
+            const time = now.toLocaleTimeString();
+            const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+            const date = now.toLocaleDateString('en-US', dateOptions);
+            const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+
+            document.getElementById('current-time').textContent = time;
+            document.getElementById('current-date').textContent = date;
+            document.getElementById('current-day').textContent = day;
+        }
+
+        setInterval(fetchData, 1000);
+        setInterval(updateTimeAndDate, 1000);
+    </script>
+</body>
+</html>
