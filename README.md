@@ -10,6 +10,7 @@ The system aims to reduce traffic congestion, improve parking efficiency, and en
 The Smart Parking System processes live camera streams to identify free and occupied parking spots with high accuracy and low latency.
 The platform is designed for potential integration with **IoT devices**, mobile applications, and centralized smart city dashboards.
 It is built with a focus on scalability, real-time performance, and reliable AI detection.
+<img width="819" height="528" alt="image" src="https://github.com/user-attachments/assets/1622ad0d-b4f2-4594-84dc-596769226f2e" />
 
 ---
 
