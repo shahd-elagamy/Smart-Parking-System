@@ -1,13 +1,89 @@
-# Smart-Parking-System
+# Smart Parking System – Real-Time AI-Based Detection
 
-🚗 Real-Time Smart Parking System using YOLOv11 & OpenCV  
-Developed a real-time AI-based parking detection system to reduce traffic congestion and improve efficiency.  
-The system processes live video streams to detect occupied and vacant parking spots with high accuracy and low latency.  
-Potential integration with IoT and mobile apps enables full automation for smart city infrastructure.
+Real-time Smart Parking System using **YOLOv11** and **OpenCV** to detect occupied and vacant parking spaces from live video feeds.
+The system aims to reduce traffic congestion, improve parking efficiency, and enable smart city infrastructure integration.
 
+---
 
-<img width="819" height="528" alt="image" src="https://github.com/user-attachments/assets/1622ad0d-b4f2-4594-84dc-596769226f2e" />
+## Overview
 
+The Smart Parking System processes live camera streams to identify free and occupied parking spots with high accuracy and low latency.
+The platform is designed for potential integration with **IoT devices**, mobile applications, and centralized smart city dashboards.
+It is built with a focus on scalability, real-time performance, and reliable AI detection.
 
-## Research paper of the project:
-https://drive.google.com/file/d/1EvmcSJAUuiBhQIexYOiE0oSZObKFFKWS/view?usp=sharing
+---
+
+## Key Features
+
+* Real-time detection of occupied and vacant parking spots
+* High accuracy and fast processing using YOLOv11
+* Potential integration with IoT devices and mobile applications
+* Data logging for parking utilization analytics
+* Dashboard-ready outputs for smart city monitoring
+
+---
+
+## Technologies Used
+
+### Programming Languages
+
+* Python
+* HTML/CSS (for dashboard if needed)
+* JavaScript (optional for visualization)
+
+### Frameworks and Libraries
+
+* OpenCV
+* YOLOv11 (PyTorch implementation)
+* NumPy, Pandas (for data handling and analysis)
+* Matplotlib / Seaborn (optional for visualization)
+
+### Development Tools
+
+* VS Code
+* Git
+* Google Colab (for model training and testing)
+
+---
+
+## System Architecture
+
+* **Input:** Live video stream from parking lot cameras
+* **Processing:** YOLOv11 object detection to classify spots as occupied or vacant
+* **Output:** Visual overlay on video feed and optional structured data for dashboards or mobile apps
+* **Potential Integration:** IoT parking sensors and mobile applications for real-time monitoring
+
+---
+
+## Results
+
+* Achieves high detection accuracy in varied lighting conditions
+* Processes video frames in real-time (low latency)
+* Supports large parking lots with multiple camera feeds
+* Provides foundation for smart city parking management
+
+---
+
+## Research Paper
+
+The project has a co-authored research paper detailing the implementation, evaluation, and results:
+[View Research Paper](https://drive.google.com/file/d/1EvmcSJAUuiBhQIexYOiE0oSZObKFFKWS/view?usp=sharing)
+
+---
+
+## Future Enhancements
+
+* Integration with mobile apps for user parking notifications
+* IoT-based automated parking access control
+* Cloud-based dashboard for multi-location parking monitoring
+* Vehicle license plate recognition for parking management
+* Predictive analytics for parking demand using historical data
+
+---
+
+## Authors
+
+* Shahd Elagamy
+* Dr.Fatima M. Talaat
+* Rahma Ezzat
+* Samaa Ghorab
